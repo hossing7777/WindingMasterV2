@@ -9,12 +9,21 @@ object PhaseCode {
     const val AUX = 2
 }
 
+/** گام سیم‌پیچی (فقط برای تب پیشرفته) */
+enum class PitchMode { FULL, FRACTIONAL }
+
+/** چیدمان کویل‌ها (فقط برای تب پیشرفته) */
+enum class WindingLayout { CONCENTRIC, SERIES }
+
 data class WindingInput(
     val slots: Int,
     val poles: Int,
     val frequency: Int = 50,
     val phases: Int = 3,
     val windingType: WindingType = WindingType.FULL_CONCENTRIC,
+    /** برای تب پیشرفته — جایگزین windingType */
+    val pitchMode: PitchMode = PitchMode.FULL,
+    val layout: WindingLayout = WindingLayout.CONCENTRIC,
     val coilPitch: Int? = null
 )
 
@@ -64,6 +73,12 @@ data class WindingResult(
     val coilPitchY1: Int,
     val coilPitchY2: Int,
     val coilJumpB: Int,
+    /** لیست کامل گام کویل‌های یک گروه — برای جدول پیشرفته */
+    val pitchList: List<Int> = emptyList(),
+    /** حالت گام (فقط برای نمایش در تب پیشرفته) */
+    val pitchMode: PitchMode = PitchMode.FULL,
+    /** چیدمان (فقط برای نمایش در تب پیشرفته) */
+    val layout: WindingLayout = WindingLayout.CONCENTRIC,
     val slotAssignments: List<SlotAssignment>,
     val coilGroups: List<CoilGroup>,
     val warnings: List<CalcWarning>
