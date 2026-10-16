@@ -58,7 +58,7 @@ private val SlotWidth = 44.dp
 
 /** رنگ‌های سه‌گانه برای هایلایت */
 private val SelectedColor = Color(0xFFD32F2F)   // قرمز — شیار انتخابی
-private val PairedColor   = Color(0xFF7B1FA2)   // بنفش — شیار مقابل
+private val PairedColor   = Color(0xFFE040FB)   // بنفش — شیار مقابل
 private val WireColor     = Color(0xFF00C853)   // سبز — سیم/قوس اتصال
 
 @Composable
