@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">استاد سیم‌پیچی</string>
+    <string name="nav_motors">موتورها</string>
+    <string name="nav_calculator">محاسبه</string>
+    <string name="nav_checklist">چک‌لیست</string>
+    <string name="nav_profile">پروفایل</string>
+    <string name="nav_notes">یادداشت</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <string name="action_save">ذخیره</string>
+    <string name="action_cancel">انصراف</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_add">افزودن</string>
+    <string name="action_reset">بازنشانی</string>
+    <string name="action_undo">برگشت</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_edit">ویرایش</string>
+    <string name="action_share">اشتراک‌گذاری</string>
+    <string name="action_load">بارگذاری</string>
+    <string name="action_reset_selection">لغو انتخاب</string>
+    <string name="label_yes">بله</string>
+    <string name="label_no">خیر</string>
+    <string name="dialog_delete_title">حذف</string>
+    <string name="dialog_delete_message_fmt">«%1$s» حذف شود؟</string>
+
+    <string name="calc_slots">تعداد شیار (Z)</string>
+    <string name="calc_poles">تعداد قطب (2p)</string>
+    <string name="calc_frequency">فرکانس (Hz)</string>
+    <string name="calc_phases">تعداد فاز</string>
+    <string name="calc_phase_single">تک‌فاز</string>
+    <string name="calc_phase_three">سه‌فاز</string>
+    <string name="calc_winding_type">نوع سیم‌بندی</string>
+    <string name="wt_full">گام کامل</string>
+    <string name="wt_shortened">کوتاه‌شده</string>
+    <string name="wt_concentric">متحدالمرکز</string>
+    <string name="wt_series">سری</string>
+    <string name="calc_pitch">گام کویل</string>
+    <string name="calc_pitch_hint">خالی = خودکار (Z ÷ 2p)</string>
+    <string name="calc_results">نتایج</string>
+    <string name="calc_diagram">نوع دیاگرام</string>
+    <string name="diagram_circular">دایره‌ای</string>
+    <string name="diagram_extended">گسترده</string>
+    <string name="diagram_interactive">تعاملی</string>
+    <string name="calc_save">ذخیره محاسبه</string>
+    <string name="calc_save_name">نام</string>
+    <string name="calc_saved_msg">«%1$s» ذخیره شد</string>
+    <string name="calc_saved_list">محاسبه‌های ذخیره‌شده</string>
+    <string name="calc_saved_summary">شیار %1$d، قطب %2$d، %3$d فاز</string>
+    <string name="calc_rpm_fmt">%1$d دور بر دقیقه</string>
+
+    <string name="res_pole_pairs">جفت‌قطب (P)</string>
+    <string name="res_aez">زاویه الکتریکی (AEZ)</string>
+    <string name="res_q">شیار در هر قطب در هر فاز (q)</string>
+    <string name="res_t">گام قطبی (T)</string>
+    <string name="res_n">سرعت سنکرون (N)</string>
+    <string name="res_g">گام سیم‌بندی (g)</string>
+    <string name="res_g_reduced">گام کوتاه‌شده (g\')</string>
+    <string name="res_y1">گام کویل Y1</string>
+    <string name="res_y2">گام کویل Y2</string>
+    <string name="res_b">شیار پرش (B)</string>
+    <string name="res_starts">شیار شروع فازها</string>
+    <string name="res_fractional">سیم‌پیچی کسری</string>
+
+    <string name="phase_u">U</string>
+    <string name="phase_v">V</string>
+    <string name="phase_w">W</string>
+    <string name="phase_main_short">ا</string>
+    <string name="phase_aux_short">ک</string>
+    <string name="phase_main">اصلی</string>
+    <string name="phase_aux">کمکی</string>
+    <string name="legend_phase_fmt">فاز %1$s</string>
+    <string name="legend_direction">↑ جریان رو به بالا     ↓ جریان رو به پایین</string>
+    <string name="diagram_zoom_hint">برای بزرگ‌نمایی و جابه‌جایی با دو انگشت حرکت دهید.</string>
+    <string name="diagram_reset_view">بازنشانی نما</string>
+    <string name="interactive_hint">روی یک شیار در دایره یا نوار پایین بزنید.</string>
+    <string name="slot_none_selected">شیاری انتخاب نشده است.</string>
+    <string name="slot_title_fmt">شیار %1$d</string>
+    <string name="slot_phase_fmt">فاز: %1$s</string>
+    <string name="slot_direction_fmt">جهت: %1$s</string>
+    <string name="dir_up">↑ بالا</string>
+    <string name="dir_down">↓ پایین</string>
+    <string name="slot_group_fmt">گروه قطبی: %1$d</string>
+    <string name="slot_paired_fmt">شیار مقابل: %1$d</string>
+    <string name="slot_pitch_fmt">گام کویل: %1$d</string>
+
+    <string name="motors_empty">هنوز موتوری ثبت نشده است. با دکمه‌ی + یک موتور اضافه کنید.</string>
+    <string name="motors_hint">لمس: ویرایش • لمس طولانی: حذف</string>
+    <string name="motor_edit_title">مشخصات موتور</string>
+    <string name="field_name">نام موتور</string>
+    <string name="field_manufacturer">سازنده</string>
+    <string name="field_power_kw">توان (kW)</string>
+    <string name="field_voltage">ولتاژ (V)</string>
+    <string name="field_current">جریان (A)</string>
+    <string name="field_rpm">سرعت (RPM)</string>
+    <string name="field_phases">تعداد فاز</string>
+    <string name="field_slots">تعداد شیار</string>
+    <string name="field_poles">تعداد قطب</string>
+    <string name="field_connection">نوع اتصال</string>
+    <string name="field_wire_diameter">قطر سیم (mm)</string>
+    <string name="field_turns_per_coil">تعداد دور هر کویل</string>
+    <string name="field_notes">توضیحات</string>
+    <string name="connection_star">ستاره</string>
+    <string name="connection_delta">مثلث</string>
+    <string name="error_name_required">نام الزامی است.</string>
+
+    <string name="checklist_progress_fmt">%1$d از %2$d انجام شد</string>
+    <string name="checklist_add_hint">مورد دلخواه…</string>
+    <string name="chk_record_nameplate">ثبت اطلاعات پلاک موتور</string>
+    <string name="chk_photo_connections">عکس‌برداری از اتصالات و سر کلاف‌ها</string>
+    <string name="chk_record_winding_data">ثبت مشخصات سیم‌پیچی (گام، تعداد دور، قطر سیم)</string>
+    <string name="chk_remove_old_winding">بیرون آوردن سیم‌پیچی قدیمی</string>
+    <string name="chk_clean_slots">تمیزکاری شیارها</string>
+    <string name="chk_insulate_slots">عایق‌کاری شیارها</string>
+    <string name="chk_wind_coils">پیچیدن کویل‌ها</string>
+    <string name="chk_insert_coils">جا زدن کویل‌ها در شیارها</string>
+    <string name="chk_wedge_and_tie">گوه‌گذاری و بستن سر کلاف‌ها</string>
+    <string name="chk_connect_groups">اتصال گروه‌ها طبق دیاگرام</string>
+    <string name="chk_insulation_test">تست عایق و مقاومت فازها</string>
+    <string name="chk_varnish_and_cure">ورنی‌کاری و پخت</string>
+    <string name="chk_no_load_test">تست بی‌باری</string>
+
+    <string name="profile_select_motor">یک موتور را برای مشاهده‌ی پروفایل انتخاب کنید.</string>
+    <string name="profile_no_motors">ابتدا از بخش «موتورها» یک موتور اضافه کنید.</string>
+    <string name="profile_open_checklist">چک‌لیست این موتور</string>
+    <string name="profile_notes">یادداشت‌های این موتور</string>
+    <string name="profile_notes_empty">یادداشتی ثبت نشده است.</string>
+    <string name="profile_new_note">یادداشت جدید</string>
+
+    <string name="notes_empty">هنوز یادداشتی ندارید.</string>
+    <string name="note_edit_title">یادداشت</string>
+    <string name="note_title">عنوان</string>
+    <string name="note_body">متن یادداشت</string>
+    <string name="note_title_required">عنوان الزامی است.</string>
+
+    <string name="settings_language">زبان</string>
+    <string name="lang_fa">فارسی</string>
+    <string name="lang_en">English</string>
+    <string name="settings_theme">ظاهر</string>
+    <string name="theme_system">مطابق سیستم</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تیره</string>
+    <string name="settings_about">درباره</string>
+    <string name="about_description">اپلیکیشن آفلاین محاسبه و رسم سیم‌پیچی موتورهای الکتریکی برای تعمیرکاران و دانشجویان.</string>
+    <string name="about_version_fmt">نسخه %1$s</string>
+
+    <string name="err_slots_out_of_range">تعداد شیارها باید بین ۱۲ تا ۲۰۰ باشد.</string>
+    <string name="err_slots_odd">تعداد شیارها باید زوج باشد.</string>
+    <string name="err_poles_invalid">تعداد قطب‌ها باید زوج و بین ۲ تا ۱۲ باشد.</string>
+    <string name="err_frequency_invalid">فرکانس باید بین ۱ تا ۴۰۰ هرتز باشد.</string>
+    <string name="err_phases_invalid">تعداد فاز باید ۱ یا ۳ باشد.</string>
+    <string name="err_pitch_out_of_range">گام کویل باید بین ۱ و نصف تعداد شیارها باشد.</string>
+
+    <string name="warn_fractional_winding">سیم‌پیچی کسری: تعداد شیار در هر قطب در هر فاز صحیح نیست و گروه‌ها نامتقارن (مثلاً ۳-۲-۳-۲) توزیع شده‌اند.</string>
+    <string name="warn_fractional_pitch">گام قطبی صحیح نیست؛ گام با گرد کردن به پایین محاسبه شد.</string>
+    <string name="warn_slots_not_divisible_by_3">تعداد شیارها بر ۳ بخش‌پذیر نیست؛ سیم‌پیچی سه‌فاز کاملاً متقارن نخواهد بود.</string>
+</resources>

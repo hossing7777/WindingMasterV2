@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Winding Master</string>
+    <string name="nav_motors">Motors</string>
+    <string name="nav_calculator">Calculator</string>
+    <string name="nav_checklist">Checklist</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_notes">Notes</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_add">Add</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_back">Back</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_share">Share</string>
+    <string name="action_load">Load</string>
+    <string name="action_reset_selection">Reset selection</string>
+    <string name="label_yes">Yes</string>
+    <string name="label_no">No</string>
+    <string name="dialog_delete_title">Delete</string>
+    <string name="dialog_delete_message_fmt">Delete \"%1$s\"?</string>
+
+    <string name="calc_slots">Slots (Z)</string>
+    <string name="calc_poles">Poles (2p)</string>
+    <string name="calc_frequency">Frequency (Hz)</string>
+    <string name="calc_phases">Phases</string>
+    <string name="calc_phase_single">Single-phase</string>
+    <string name="calc_phase_three">Three-phase</string>
+    <string name="calc_winding_type">Winding type</string>
+    <string name="wt_full">Full pitch</string>
+    <string name="wt_shortened">Short pitch</string>
+    <string name="wt_concentric">Concentric</string>
+    <string name="wt_series">Series</string>
+    <string name="calc_pitch">Coil pitch</string>
+    <string name="calc_pitch_hint">Empty = automatic (Z ÷ 2p)</string>
+    <string name="calc_results">Results</string>
+    <string name="calc_diagram">Diagram type</string>
+    <string name="diagram_circular">Circular</string>
+    <string name="diagram_extended">Extended</string>
+    <string name="diagram_interactive">Interactive</string>
+    <string name="calc_save">Save calculation</string>
+    <string name="calc_save_name">Name</string>
+    <string name="calc_saved_msg">\"%1$s\" saved</string>
+    <string name="calc_saved_list">Saved calculations</string>
+    <string name="calc_saved_summary">%1$d slots, %2$d poles, %3$d phase</string>
+    <string name="calc_rpm_fmt">%1$d RPM</string>
+
+    <string name="res_pole_pairs">Pole pairs (P)</string>
+    <string name="res_aez">Electrical angle (AEZ)</string>
+    <string name="res_q">Slots per pole per phase (q)</string>
+    <string name="res_t">Pole pitch (T)</string>
+    <string name="res_n">Synchronous speed (N)</string>
+    <string name="res_g">Winding step (g)</string>
+    <string name="res_g_reduced">Reduced step (g\')</string>
+    <string name="res_y1">Coil pitch Y1</string>
+    <string name="res_y2">Coil pitch Y2</string>
+    <string name="res_b">Jump slots (B)</string>
+    <string name="res_starts">Phase start slots</string>
+    <string name="res_fractional">Fractional winding</string>
+
+    <string name="phase_u">U</string>
+    <string name="phase_v">V</string>
+    <string name="phase_w">W</string>
+    <string name="phase_main_short">M</string>
+    <string name="phase_aux_short">A</string>
+    <string name="phase_main">Main</string>
+    <string name="phase_aux">Auxiliary</string>
+    <string name="legend_phase_fmt">Phase %1$s</string>
+    <string name="legend_direction">↑ current up     ↓ current down</string>
+    <string name="diagram_zoom_hint">Pinch to zoom and drag to pan.</string>
+    <string name="diagram_reset_view">Reset view</string>
+    <string name="interactive_hint">Tap a slot on the circle or on the strip below.</string>
+    <string name="slot_none_selected">No slot selected.</string>
+    <string name="slot_title_fmt">Slot %1$d</string>
+    <string name="slot_phase_fmt">Phase: %1$s</string>
+    <string name="slot_direction_fmt">Direction: %1$s</string>
+    <string name="dir_up">↑ Up</string>
+    <string name="dir_down">↓ Down</string>
+    <string name="slot_group_fmt">Pole group: %1$d</string>
+    <string name="slot_paired_fmt">Paired slot: %1$d</string>
+    <string name="slot_pitch_fmt">Coil pitch: %1$d</string>
+
+    <string name="motors_empty">No motors yet. Tap + to add one.</string>
+    <string name="motors_hint">Tap: edit • Long press: delete</string>
+    <string name="motor_edit_title">Motor details</string>
+    <string name="field_name">Motor name</string>
+    <string name="field_manufacturer">Manufacturer</string>
+    <string name="field_power_kw">Power (kW)</string>
+    <string name="field_voltage">Voltage (V)</string>
+    <string name="field_current">Current (A)</string>
+    <string name="field_rpm">Speed (RPM)</string>
+    <string name="field_phases">Phases</string>
+    <string name="field_slots">Slots</string>
+    <string name="field_poles">Poles</string>
+    <string name="field_connection">Connection</string>
+    <string name="field_wire_diameter">Wire diameter (mm)</string>
+    <string name="field_turns_per_coil">Turns per coil</string>
+    <string name="field_notes">Notes</string>
+    <string name="connection_star">Star</string>
+    <string name="connection_delta">Delta</string>
+    <string name="error_name_required">Name is required.</string>
+
+    <string name="checklist_progress_fmt">%1$d of %2$d done</string>
+    <string name="checklist_add_hint">Custom item…</string>
+    <string name="chk_record_nameplate">Record the motor nameplate data</string>
+    <string name="chk_photo_connections">Photograph the connections and coil leads</string>
+    <string name="chk_record_winding_data">Record winding data (pitch, turns, wire diameter)</string>
+    <string name="chk_remove_old_winding">Remove the old winding</string>
+    <string name="chk_clean_slots">Clean the slots</string>
+    <string name="chk_insulate_slots">Insulate the slots</string>
+    <string name="chk_wind_coils">Wind the coils</string>
+    <string name="chk_insert_coils">Insert the coils into the slots</string>
+    <string name="chk_wedge_and_tie">Wedge the slots and tie the end turns</string>
+    <string name="chk_connect_groups">Connect the coil groups per the diagram</string>
+    <string name="chk_insulation_test">Test insulation and phase resistance</string>
+    <string name="chk_varnish_and_cure">Varnish and cure</string>
+    <string name="chk_no_load_test">No-load test</string>
+
+    <string name="profile_select_motor">Select a motor to view its profile.</string>
+    <string name="profile_no_motors">Add a motor in the Motors tab first.</string>
+    <string name="profile_open_checklist">Checklist for this motor</string>
+    <string name="profile_notes">Notes for this motor</string>
+    <string name="profile_notes_empty">No notes yet.</string>
+    <string name="profile_new_note">New note</string>
+
+    <string name="notes_empty">You have no notes yet.</string>
+    <string name="note_edit_title">Note</string>
+    <string name="note_title">Title</string>
+    <string name="note_body">Note text</string>
+    <string name="note_title_required">Title is required.</string>
+
+    <string name="settings_language">Language</string>
+    <string name="lang_fa">فارسی</string>
+    <string name="lang_en">English</string>
+    <string name="settings_theme">Appearance</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_about">About</string>
+    <string name="about_description">An offline app for calculating and drawing electric motor windings, for repair technicians and students.</string>
+    <string name="about_version_fmt">Version %1$s</string>
+
+    <string name="err_slots_out_of_range">Slots must be between 12 and 200.</string>
+    <string name="err_slots_odd">The number of slots must be even.</string>
+    <string name="err_poles_invalid">Poles must be even and between 2 and 12.</string>
+    <string name="err_frequency_invalid">Frequency must be between 1 and 400 Hz.</string>
+    <string name="err_phases_invalid">Phases must be 1 or 3.</string>
+    <string name="err_pitch_out_of_range">Coil pitch must be between 1 and half the number of slots.</string>
+
+    <string name="warn_fractional_winding">Fractional winding: slots per pole per phase is not an integer, so groups are distributed asymmetrically (for example 3-2-3-2).</string>
+    <string name="warn_fractional_pitch">The pole pitch is not an integer; the winding step was rounded down.</string>
+    <string name="warn_slots_not_divisible_by_3">The slot count is not divisible by 3; the three-phase winding will not be fully symmetric.</string>
+</resources>

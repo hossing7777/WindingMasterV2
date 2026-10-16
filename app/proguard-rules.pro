@@ -1,0 +1,2 @@
+-keepattributes *Annotation*, SourceFile, LineNumberTable
+-keep class com.windingmaster.data.local.entity.** { *; }
