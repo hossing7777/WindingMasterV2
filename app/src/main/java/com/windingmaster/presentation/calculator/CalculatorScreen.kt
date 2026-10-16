@@ -99,6 +99,23 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = hiltViewModel()) {
             ResultCard(result)
 
             Text(stringResource(R.string.calc_diagram), style = MaterialTheme.typography.titleMedium)
+
+            // Toggle چیپ‌های سیم اصلی/فرعی (فقط برای تک‌فاز)
+            if (result.phases == 1) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = showMain,
+                        onClick = { showMain = !showMain },
+                        label = { Text("سیم اصلی") }
+                    )
+                    FilterChip(
+                        selected = showAux,
+                        onClick = { showAux = !showAux },
+                        label = { Text("سیم فرعی") }
+                    )
+                }
+            }
+
             ChipRow(
                 options = listOf(0, 1, 2),
                 selected = diagramIndex,
@@ -113,33 +130,27 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = hiltViewModel()) {
                 },
                 onSelect = { diagramIndex = it }
             )
+
             when (diagramIndex) {
-                0 -> WindingDiagram(result)
-                1 -> {
-                    if (result.phases == 1) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(
-                                selected = showMain,
-                                onClick = { showMain = !showMain },
-                                label = { Text("سیم اصلی") }
-                            )
-                            FilterChip(
-                                selected = showAux,
-                                onClick = { showAux = !showAux },
-                                label = { Text("سیم فرعی") }
-                            )
-                        }
-                        Spacer(Modifier.height(4.dp))
-                    }
-                    ExtendedDiagram(
-                        result,
-                        selectedSlot = state.selectedSlot,
-                        onSlotClick = viewModel::onSlotSelected,
-                        showMain = showMain,
-                        showAux = showAux
-                    )
-                }
-                else -> InteractiveDiagram(result, state.selectedSlot, viewModel::onSlotSelected)
+                0 -> WindingDiagram(
+                    result,
+                    selectedSlot = state.selectedSlot,
+                    onSlotTap = viewModel::onSlotSelected,
+                    showMain = showMain,
+                    showAux = showAux
+                )
+                1 -> ExtendedDiagram(
+                    result,
+                    selectedSlot = state.selectedSlot,
+                    onSlotClick = viewModel::onSlotSelected,
+                    showMain = showMain,
+                    showAux = showAux
+                )
+                else -> InteractiveDiagram(
+                    result,
+                    state.selectedSlot,
+                    viewModel::onSlotSelected
+                )
             }
 
             Button(onClick = { showSave = true }) { Text(stringResource(R.string.calc_save)) }
