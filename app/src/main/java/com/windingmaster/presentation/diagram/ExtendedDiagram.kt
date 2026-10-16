@@ -3,13 +3,18 @@ package com.windingmaster.presentation.diagram
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +22,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.CornerRadius
@@ -30,12 +36,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.windingmaster.R
 import com.windingmaster.domain.model.SlotAssignment
 import com.windingmaster.domain.model.WindingResult
 import com.windingmaster.presentation.components.DiagramLegend
@@ -47,6 +55,11 @@ import com.windingmaster.presentation.components.rememberPhaseStyle
 import kotlin.math.min
 
 private val SlotWidth = 44.dp
+
+/** رنگ‌های سه‌گانه برای هایلایت */
+private val SelectedColor = Color(0xFFD32F2F)   // قرمز — شیار انتخابی
+private val PairedColor   = Color(0xFF7B1FA2)   // بنفش — شیار مقابل
+private val WireColor     = Color(0xFF00C853)   // سبز — سیم/قوس اتصال
 
 @Composable
 fun ExtendedDiagram(
@@ -100,8 +113,69 @@ fun ExtendedDiagram(
                     drawExtended(result, bySlot, style, measurer, starts, selectedSlot, pairedSel, ink, soft)
                 }
             }
+            if (selectedSlot != null && pairedSel != null) {
+                SlotRelationCard(selectedSlot, pairedSel, bySlot, style)
+            }
             if (showLegend) DiagramLegend(style)
         }
+    }
+}
+
+/** کادر کوچک اطلاعات رابطه‌ی شیار انتخابی و شیار مقابل */
+@Composable
+private fun SlotRelationCard(
+    selected: Int,
+    paired: Int,
+    bySlot: Map<Int, SlotAssignment>,
+    style: PhaseStyle
+) {
+    val span = ((paired - selected) % (bySlot.size).coerceAtLeast(1) + bySlot.size) % bySlot.size
+    val selAssign = bySlot[selected]
+    val pairedAssign = bySlot[paired]
+    val selPhase = selAssign?.let { style.label(it.phase) } ?: "?"
+    val pairedPhase = pairedAssign?.let { style.label(it.phase) } ?: "?"
+
+    Card(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        Column(Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "شیار $selected",
+                    color = SelectedColor,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text("  ←→  ", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "شیار $paired",
+                    color = PairedColor,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Text(
+                "گام کویل: $span     |     فازها: $selPhase → $pairedPhase",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Row(Modifier.padding(top = 6.dp)) {
+                LegendDot(SelectedColor, "انتخاب‌شده")
+                LegendDot(PairedColor, "مقابل", Modifier.padding(start = 12.dp))
+                LegendDot(WireColor, "سیم اتصال", Modifier.padding(start = 12.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendDot(color: Color, label: String, modifier: Modifier = Modifier) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.width(14.dp).height(14.dp).clipToBounds()
+            .padding(0.dp).then(Modifier)) {
+            Canvas(Modifier.width(14.dp).height(14.dp)) {
+                drawRoundRect(color, size = size, cornerRadius = CornerRadius(3f))
+            }
+        }
+        Text(label, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 4.dp))
     }
 }
 
@@ -136,11 +210,17 @@ private fun DrawScope.drawExtended(
     val baseY = 150.dp.toPx()
     val total = z * w
 
+    // پس‌زمینه‌ی شیار انتخابی
     if (selected != null) {
-        drawRect(PhaseColors.Highlight.copy(alpha = 0.10f), Offset((selected - 1) * w, 0f), Size(w, size.height))
+        drawRect(SelectedColor.copy(alpha = 0.10f), Offset((selected - 1) * w, 0f), Size(w, size.height))
     }
+    if (pairedSel != null) {
+        drawRect(PairedColor.copy(alpha = 0.10f), Offset((pairedSel - 1) * w, 0f), Size(w, size.height))
+    }
+    // نوار هسته‌ی استاتور
     drawRect(soft, Offset(0f, baseY - 4.dp.toPx()), Size(total, rectH + 8.dp.toPx()))
 
+    // قوس‌های کویل
     val strokeW = 2.dp.toPx()
     val maxPeak = 135.dp.toPx()
     for (a in result.slotAssignments) {
@@ -150,9 +230,18 @@ private fun DrawScope.drawExtended(
         val x1 = (a.slotNumber - 0.5f) * w
         val x2 = x1 + span * w
         val peak = min(span * w * 0.5f, maxPeak)
-        val hot = a.slotNumber == selected || a.pairedSlot == selected
-        val color = if (hot) PhaseColors.Highlight else style.color(a.phase).copy(alpha = 0.9f)
-        val sw = if (hot) strokeW * 1.8f else strokeW
+
+        // آیا این قوس مربوط به شیار انتخابی است؟
+        val isSelectedArc = selected != null && a.slotNumber == selected
+        val isPairedArc = pairedSel != null && a.slotNumber == pairedSel
+        val hot = isSelectedArc || isPairedArc
+
+        val color = when {
+            isSelectedArc -> WireColor          // قوس از شیار انتخابی → سبز روشن
+            isPairedArc   -> WireColor.copy(alpha = 0.5f)
+            else          -> style.color(a.phase).copy(alpha = 0.9f)
+        }
+        val sw = if (hot) strokeW * 2.4f else strokeW
         coilArc(x1, x2, baseY - 2.dp.toPx(), peak, color, sw, dashed = false)
         if (x2 > total) coilArc(x1 - total, x2 - total, baseY - 2.dp.toPx(), peak, color, sw, dashed = true)
     }
@@ -168,18 +257,32 @@ private fun DrawScope.drawExtended(
         val rw = w * 0.78f
         val topLeft = Offset(cx - rw / 2f, baseY)
 
-        if (i == selected || i == pairedSel) {
-            val pad = 3.dp.toPx()
-            drawRoundRect(
-                PhaseColors.Highlight.copy(alpha = if (i == selected) 1f else 0.55f),
-                Offset(topLeft.x - pad, baseY - pad), Size(rw + 2 * pad, rectH + 2 * pad),
-                CornerRadius(8.dp.toPx())
-            )
+        // هایلایت سه‌گانه: قرمز برای انتخابی، بنفش برای مقابل
+        when (i) {
+            selected -> {
+                val pad = 4.dp.toPx()
+                drawRoundRect(
+                    SelectedColor,
+                    Offset(topLeft.x - pad, baseY - pad),
+                    Size(rw + 2 * pad, rectH + 2 * pad),
+                    CornerRadius(8.dp.toPx())
+                )
+            }
+            pairedSel -> {
+                val pad = 4.dp.toPx()
+                drawRoundRect(
+                    PairedColor,
+                    Offset(topLeft.x - pad, baseY - pad),
+                    Size(rw + 2 * pad, rectH + 2 * pad),
+                    CornerRadius(8.dp.toPx())
+                )
+            }
         }
-        drawRoundRect(color, topLeft, Size(rw, rectH), CornerRadius(6.dp.toPx()))
 
+        drawRoundRect(color, topLeft, Size(rw, rectH), CornerRadius(6.dp.toPx()))
         drawCentered(measurer, i.toString(), Offset(cx, baseY + 12.dp.toPx()), numberStyle(onColor))
 
+        // فلش جهت
         val top = baseY + 28.dp.toPx()
         val bottom = baseY + rectH - 8.dp.toPx()
         val up = a.direction == 1
@@ -192,8 +295,10 @@ private fun DrawScope.drawExtended(
         drawLine(onColor, Offset(cx, head), Offset(cx - wing, head + back), strokeWidth = sw)
         drawLine(onColor, Offset(cx, head), Offset(cx + wing, head + back), strokeWidth = sw)
 
+        // حرف فاز
         drawCentered(measurer, style.label(a.phase), Offset(cx, baseY + rectH + 14.dp.toPx()), letterStyle(color))
 
+        // برچسب U1/V1/W1
         starts[i]?.let { idx ->
             val pillColor = style.colors.getOrElse(idx) { color }
             val pillW = 34.dp.toPx()
