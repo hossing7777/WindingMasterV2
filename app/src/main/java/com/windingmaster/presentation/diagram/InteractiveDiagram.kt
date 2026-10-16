@@ -66,7 +66,7 @@ private fun SlotInfoCard(result: WindingResult, selectedSlot: Int?) {
             if (assignment == null) {
                 Text(stringResource(R.string.slot_none_selected))
             } else {
-                val span = ((assignment.pairedSlot - assignment.slotNumber) % result.z + result.z) % result.z
+                val span = kotlin.math.abs(assignment.pairedSlot - assignment.slotNumber)
                 Text(
                     stringResource(R.string.slot_title_fmt, assignment.slotNumber),
                     style = MaterialTheme.typography.titleMedium,

@@ -6,6 +6,23 @@ import com.windingmaster.domain.model.SlotAssignment
 import com.windingmaster.domain.model.WindingType
 import javax.inject.Inject
 
+/**
+ * تخصیص فاز/جهت به شیارها با حساب صحیح (بدون خطای اعشاری).
+ *
+ * سه‌فاز: هر دور الکتریکی 6 کمربند 60 درجه‌ای دارد:
+ *   U+ , W- , V+ , U- , W+ , V-
+ * کمربند شیار i برابر است با ((i-1) * 6 * P) / Z (تقسیم صحیح).
+ * وقتی q کسری باشد، اندازه‌ی کمربندها خودبه‌خود 3-2-3-2 می‌شود.
+ *
+ * تک‌فاز: کمربندهای 180 درجه‌ای، زوج = Main (بالا)، فرد = Aux (پایین).
+ *
+ * متحدالمرکز (Concentric):
+ *   کویل‌ها در هر کمربند به صورت قرینه تودرتو می‌شوند:
+ *   شیار اول کمربند ←→ شیار آخر کمربند (بزرگ‌ترین گام)
+ *   شیار دوم ←→ شیار یکی‌مانده‌به‌آخر (گام کوچک‌تر)
+ *   ...
+ *   نیمه‌ی دوم کمربند، جفت‌شدن معکوس دارند (به شیار شروع برمی‌گردند).
+ */
 class CoilGroupAssigner @Inject constructor() {
 
     data class Output(
@@ -42,14 +59,24 @@ class CoilGroupAssigner @Inject constructor() {
         val beltSlots = LinkedHashMap<Int, MutableList<Int>>()
         for (s in 1..z) beltSlots.getOrPut(belt(s)) { mutableListOf() }.add(s)
 
-        fun pitchesFor(n: Int): List<Int> = when (type) {
-            WindingType.CONCENTRIC -> List(n) { k -> (y1 - 2 * k).coerceAtLeast(1) }
+        val isConcentric = type == WindingType.CONCENTRIC
+
+        // محاسبه‌ی لیست گام‌ها برای هر شیار در یک کمربند با n شیار
+        fun pitchesFor(n: Int): List<Int> = when {
+            isConcentric -> {
+                // الگوی قرینه: n-1, n-3, n-5, ..., 1, 1, ..., n-5, n-3, n-1
+                List(n) { k ->
+                    val distFromEdge = minOf(k, n - 1 - k)
+                    (n - 1 - 2 * distFromEdge).coerceAtLeast(1)
+                }
+            }
+            type == WindingType.SERIES -> List(n) { y2 }
             else -> List(n) { y2 }
         }
 
         val groupType = when {
             fractional -> "FRACTIONAL"
-            type == WindingType.CONCENTRIC -> "CONCENTRIC"
+            isConcentric -> "CONCENTRIC"
             type == WindingType.SERIES -> "SERIES"
             else -> "FULL"
         }
@@ -63,17 +90,28 @@ class CoilGroupAssigner @Inject constructor() {
             val groupsOfPhase = phaseSlots.getOrPut(phase) { mutableListOf() }
             val pitchesOfPhase = phasePitches.getOrPut(phase) { mutableListOf() }
             val groupIndex = groupsOfPhase.size
-            val pitches = pitchesFor(slots.size)
+            val n = slots.size
+            val pitches = pitchesFor(n)
             groupsOfPhase.add(slots)
             pitchesOfPhase.add(pitches)
+
+            val midPoint = (n + 1) / 2  // مرز نیمه‌ی اول و دوم
             slots.forEachIndexed { k, slot ->
+                val pitch = pitches[k]
+                // برای متحدالمرکز: نیمه‌ی دوم به عقب جفت می‌شود
+                val isSecondHalf = isConcentric && k >= midPoint
+                val pairedSlot = if (isSecondHalf) {
+                    ((slot - 1 - pitch) % z + z) % z + 1
+                } else {
+                    (slot - 1 + pitch) % z + 1
+                }
                 assignments.add(
                     SlotAssignment(
                         slotNumber = slot,
                         phase = phase,
                         direction = dir,
                         groupIndex = groupIndex,
-                        pairedSlot = (slot - 1 + pitches[k]) % z + 1
+                        pairedSlot = pairedSlot
                     )
                 )
             }

@@ -129,7 +129,7 @@ private fun SlotRelationCard(
     bySlot: Map<Int, SlotAssignment>,
     style: PhaseStyle
 ) {
-    val span = ((paired - selected) % (bySlot.size).coerceAtLeast(1) + bySlot.size) % bySlot.size
+    val span = kotlin.math.abs(paired - selected)
     val selAssign = bySlot[selected]
     val pairedAssign = bySlot[paired]
     val selPhase = selAssign?.let { style.label(it.phase) } ?: "?"
