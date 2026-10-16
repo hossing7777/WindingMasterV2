@@ -3,15 +3,22 @@ package com.windingmaster.presentation.diagram
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +37,8 @@ fun InteractiveDiagram(
 ) {
     val style = rememberPhaseStyle(result.phases)
     val history = remember(result.z, result.poles, result.phases) { mutableStateListOf<Int>() }
+    var showMain by rememberSaveable { mutableStateOf(true) }
+    var showAux by rememberSaveable { mutableStateOf(true) }
 
     val pick: (Int) -> Unit = { slot ->
         if (slot != selectedSlot) {
@@ -40,8 +49,38 @@ fun InteractiveDiagram(
 
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(stringResource(R.string.interactive_hint), style = MaterialTheme.typography.bodySmall)
-        WindingDiagram(result, selectedSlot = selectedSlot, onSlotTap = pick, showLegend = false)
-        ExtendedDiagram(result, selectedSlot = selectedSlot, onSlotClick = pick, showLegend = false)
+
+        if (result.phases == 1) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = showMain,
+                    onClick = { showMain = !showMain },
+                    label = { Text("سیم اصلی") }
+                )
+                FilterChip(
+                    selected = showAux,
+                    onClick = { showAux = !showAux },
+                    label = { Text("سیم فرعی") }
+                )
+            }
+        }
+
+        WindingDiagram(
+            result,
+            selectedSlot = selectedSlot,
+            onSlotTap = pick,
+            showLegend = false,
+            showMain = showMain,
+            showAux = showAux
+        )
+        ExtendedDiagram(
+            result,
+            selectedSlot = selectedSlot,
+            onSlotClick = pick,
+            showLegend = false,
+            showMain = showMain,
+            showAux = showAux
+        )
         DiagramLegend(style)
         SlotInfoCard(result, selectedSlot)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

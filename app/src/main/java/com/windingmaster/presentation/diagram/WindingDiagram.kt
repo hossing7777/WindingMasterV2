@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.windingmaster.R
+import com.windingmaster.domain.model.PhaseCode
 import com.windingmaster.domain.model.SlotAssignment
 import com.windingmaster.domain.model.WindingResult
 import com.windingmaster.presentation.components.DiagramLegend
@@ -68,13 +69,22 @@ private fun polar(center: Offset, r: Float, deg: Float): Offset {
     return Offset(center.x + r * cos(rad).toFloat(), center.y + r * sin(rad).toFloat())
 }
 
+// رنگ‌های سیم (مطابق Extended)
+private val MainWireColor = Color(0xFF0D47A1)
+private val AuxWireColor  = Color(0xFFE65100)
+private val SelectedColor = Color(0xFFD32F2F)
+private val PairedColor   = Color(0xFFE040FB)
+private val WireHighlight = Color(0xFF00C853)
+
 @Composable
 fun WindingDiagram(
     result: WindingResult,
     modifier: Modifier = Modifier,
     selectedSlot: Int? = null,
     onSlotTap: ((Int) -> Unit)? = null,
-    showLegend: Boolean = true
+    showLegend: Boolean = true,
+    showMain: Boolean = true,
+    showAux: Boolean = true
 ) {
     val style = rememberPhaseStyle(result.phases)
     val textMeasurer = rememberTextMeasurer(cacheSize = 256)
@@ -119,9 +129,8 @@ fun WindingDiagram(
                     }
             ) {
                 drawStator(
-                    result = result, bySlot = bySlot, style = style, measurer = textMeasurer,
-                    zoom = zoom, pan = pan, selected = selectedSlot, pairedSel = pairedSel,
-                    ringBg = ringBg, ink = ink
+                    result, bySlot, style, textMeasurer, zoom, pan,
+                    selectedSlot, pairedSel, ringBg, ink, showMain, showAux
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -149,7 +158,9 @@ private fun DrawScope.drawStator(
     selected: Int?,
     pairedSel: Int?,
     ringBg: Color,
-    ink: Color
+    ink: Color,
+    showMain: Boolean,
+    showAux: Boolean
 ) {
     val g = ringGeometry(size.width, size.height)
     val z = result.z
@@ -162,19 +173,37 @@ private fun DrawScope.drawStator(
     }) {
         drawCircle(ringBg, radius = g.radius, center = g.center, style = Stroke(g.width * 1.15f))
 
+        // قوس‌های کویل (فقط سیم — با فیلتر showMain/showAux)
         val inner = g.radius - g.width * 0.65f
         for (a in result.slotAssignments) {
             if (a.direction != 1) continue
+
+            // فیلتر گروه
+            val isMainGroup = a.phase == PhaseCode.MAIN || (a.phase == 1 && result.phases == 1)
+            val isAuxGroup = a.phase == PhaseCode.AUX
+            if (isMainGroup && !showMain) continue
+            if (isAuxGroup && !showAux) continue
+
             val p1 = polar(g.center, inner, slotAngleDeg(a.slotNumber, z))
             val p2 = polar(g.center, inner, slotAngleDeg(a.pairedSlot, z))
-            val hot = a.slotNumber == selected || a.pairedSlot == selected
+            val isSelectedArc = selected != null && a.slotNumber == selected
+            val isPairedArc = pairedSel != null && a.slotNumber == pairedSel
+            val hot = isSelectedArc || isPairedArc
+
+            val color = when {
+                isSelectedArc -> WireHighlight
+                isPairedArc   -> WireHighlight.copy(alpha = 0.5f)
+                isAuxGroup    -> AuxWireColor.copy(alpha = 0.75f)
+                else          -> MainWireColor.copy(alpha = 0.75f)
+            }
             drawLine(
-                color = if (hot) PhaseColors.Highlight else style.color(a.phase).copy(alpha = 0.55f),
+                color = color,
                 start = p1, end = p2,
-                strokeWidth = if (hot) g.width * 0.12f else g.width * 0.05f
+                strokeWidth = if (hot) g.width * 0.14f else g.width * 0.06f
             )
         }
 
+        // شیارها (همیشه نمایش داده می‌شوند)
         val arcTopLeft = Offset(g.center.x - g.radius, g.center.y - g.radius)
         val arcSize = Size(g.radius * 2f, g.radius * 2f)
         for (i in 1..z) {
@@ -183,7 +212,7 @@ private fun DrawScope.drawStator(
             val sweep = stepDeg - gap
             if (i == selected || i == pairedSel) {
                 drawArc(
-                    color = PhaseColors.Highlight.copy(alpha = if (i == selected) 1f else 0.5f),
+                    color = (if (i == selected) SelectedColor else PairedColor).copy(alpha = if (i == selected) 1f else 0.7f),
                     startAngle = start - 0.3f, sweepAngle = sweep + 0.6f, useCenter = false,
                     topLeft = arcTopLeft, size = arcSize, style = Stroke(g.width * 1.45f)
                 )
@@ -195,6 +224,7 @@ private fun DrawScope.drawStator(
             )
         }
 
+        // شماره‌ی شیار و علامت جهت
         val arcLen = 2f * PI.toFloat() * g.radius * zoom / z
         val every = ceil(22f / arcLen).toInt().coerceAtLeast(1)
         val numberStyle = TextStyle(fontSize = (g.width * 0.42f).toSp(), fontWeight = FontWeight.Bold)

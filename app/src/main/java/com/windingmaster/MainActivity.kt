@@ -8,6 +8,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.os.LocaleListCompat
 import com.windingmaster.data.local.SettingsStore
 import com.windingmaster.presentation.navigation.MainNavigation
 import com.windingmaster.presentation.settings.toNightMode
@@ -22,7 +23,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // اعمال تم پیش‌فرض (تیره)
         AppCompatDelegate.setDefaultNightMode(settingsStore.themeMode.toNightMode())
+
+        // اعمال زبان پیش‌فرض (فارسی) اگر قبلاً ذخیره نشده
+        val currentLang = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        if (currentLang.isEmpty()) {
+            AppCompatDelegate.setApplicationLocales(
+                LocaleListCompat.forLanguageTags(settingsStore.language)
+            )
+        }
 
         setContent {
             val language = LocalConfiguration.current.locales[0].language
