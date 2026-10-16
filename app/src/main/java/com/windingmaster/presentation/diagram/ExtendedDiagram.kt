@@ -206,18 +206,25 @@ private fun DrawScope.drawExtended(
     }
     drawRect(soft, Offset(0f, baseY - 4.dp.toPx()), Size(total, rectH + 8.dp.toPx()))
 
-    // ============ قوس‌های سیم (اینجا فیلتر showMain/showAux اعمال می‌شود) ============
+    // ============ قوس‌های سیم ============
     val strokeW = 2.dp.toPx()
-    val maxPeak = 135.dp.toPx()
+    val maxPeak = 100.dp.toPx()
+
+    // فقط یک بار هر جفت را رسم کن (paired > slot را فقط برای concentric چک کن)
     for (a in result.slotAssignments) {
-        if (a.direction != 1) continue
         val isMainGroup = a.phase == PhaseCode.MAIN || (a.phase == 1 && result.phases == 1)
         val isAuxGroup = a.phase == PhaseCode.AUX
         if (isMainGroup && !showMain) continue
         if (isAuxGroup && !showAux) continue
 
-        val span = ((a.pairedSlot - a.slotNumber) % z + z) % z
-        if (span == 0) continue
+        // برای concentric: از نیمه‌ی دوم صرف‌نظر کن (paired < slot)
+        // برای others: هر دو جهت را می‌گیریم ولی چون forward است همیشه paired > slot
+        if (a.pairedSlot < a.slotNumber && result.isConcentric) continue
+        // برای others اگر paired < slot، یعنی wrap-around بوده
+        val spanF = a.pairedSlot - a.slotNumber
+        val span = if (spanF > 0) spanF else spanF + z
+        if (span <= 0) continue
+
         val x1 = (a.slotNumber - 0.5f) * w
         val x2 = x1 + span * w
         val peak = min(span * w * 0.5f, maxPeak)
@@ -233,11 +240,19 @@ private fun DrawScope.drawExtended(
             else          -> MainWireColor
         }
         val sw = if (hot) strokeW * 2.4f else strokeW
-        coilArc(x1, x2, baseY - 2.dp.toPx(), peak, color, sw, dashed = false)
-        if (x2 > total) coilArc(x1 - total, x2 - total, baseY - 2.dp.toPx(), peak, color, sw, dashed = true)
+
+        // رسم Arc — اگر x2 از مرز عبور کرد، دو نسخه بکش (solid + dashed wrap-around)
+        if (x2 <= total) {
+            coilArc(x1, x2, baseY - 2.dp.toPx(), peak, color, sw, dashed = false)
+        } else {
+            // بخش سمت راست (solid از x1 تا total)
+            coilArc(x1, total, baseY - 2.dp.toPx(), peak, color, sw, dashed = false)
+            // بخش wrap سمت چپ (dashed از 0 تا x2-total)
+            coilArc(0f, x2 - total, baseY - 2.dp.toPx(), peak, color.copy(alpha = 0.4f), sw * 0.8f, dashed = true)
+        }
     }
 
-    // ============ رسم شیارها (بدون فیلتر — همیشه نمایش داده می‌شوند) ============
+    // ============ رسم شیارها (بدون فیلتر) ============
     val letterStyle = { c: Color -> TextStyle(color = c, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
     val numberStyle = { c: Color -> TextStyle(color = c, fontSize = 11.sp, fontWeight = FontWeight.Bold) }
 

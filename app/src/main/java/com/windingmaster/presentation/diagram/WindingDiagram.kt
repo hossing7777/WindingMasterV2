@@ -176,13 +176,13 @@ private fun DrawScope.drawStator(
         // قوس‌های کویل (فقط سیم — با فیلتر showMain/showAux)
         val inner = g.radius - g.width * 0.65f
         for (a in result.slotAssignments) {
-            if (a.direction != 1) continue
-
-            // فیلتر گروه
             val isMainGroup = a.phase == PhaseCode.MAIN || (a.phase == 1 && result.phases == 1)
             val isAuxGroup = a.phase == PhaseCode.AUX
             if (isMainGroup && !showMain) continue
             if (isAuxGroup && !showAux) continue
+
+            // برای concentric از نیمه‌ی دوم صرف‌نظر کن
+            if (a.pairedSlot < a.slotNumber && result.isConcentric) continue
 
             val p1 = polar(g.center, inner, slotAngleDeg(a.slotNumber, z))
             val p2 = polar(g.center, inner, slotAngleDeg(a.pairedSlot, z))
@@ -193,8 +193,8 @@ private fun DrawScope.drawStator(
             val color = when {
                 isSelectedArc -> WireHighlight
                 isPairedArc   -> WireHighlight.copy(alpha = 0.5f)
-                isAuxGroup    -> AuxWireColor.copy(alpha = 0.75f)
-                else          -> MainWireColor.copy(alpha = 0.75f)
+                isAuxGroup    -> AuxWireColor.copy(alpha = 0.8f)
+                else          -> MainWireColor.copy(alpha = 0.8f)
             }
             drawLine(
                 color = color,
