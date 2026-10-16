@@ -35,7 +35,7 @@ fun Note.toEntity() = NoteEntity(id, motorId, title, body, createdAt, updatedAt)
 
 fun SavedCalculationEntity.toDomain() = SavedCalculation(
     id, name, slots, poles, frequency, phases,
-    windingType.toEnumOr(WindingType.FULL), coilPitch, createdAt
+    windingType.toEnumOr(WindingType.FULL_CONCENTRIC), coilPitch, createdAt
 )
 
 fun SavedCalculation.toEntity() = SavedCalculationEntity(

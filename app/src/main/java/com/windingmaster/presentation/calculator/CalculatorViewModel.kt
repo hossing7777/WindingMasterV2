@@ -25,7 +25,7 @@ data class CalculatorUiState(
     val poles: Int = 4,
     val frequency: String = "50",
     val phases: Int = 3,
-    val windingType: WindingType = WindingType.FULL,
+    val windingType: WindingType = WindingType.FULL_CONCENTRIC,
     val customPitch: String = "",
     val result: WindingResult? = null,
     val error: ValidationError? = null,
