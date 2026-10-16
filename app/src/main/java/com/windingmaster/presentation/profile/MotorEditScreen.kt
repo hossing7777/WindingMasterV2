@@ -62,21 +62,47 @@ fun MotorEditScreen(onDone: () -> Unit, viewModel: MotorEditViewModel = hiltView
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
-        DecimalField(stringResource(R.string.field_power_kw), m.powerKw) { v -> viewModel.edit { it.copy(powerKw = v) } }
-        IntField(stringResource(R.string.field_voltage), m.voltage) { v -> viewModel.edit { it.copy(voltage = v) } }
-        DecimalField(stringResource(R.string.field_current), m.currentA) { v -> viewModel.edit { it.copy(currentA = v) } }
-        IntField(stringResource(R.string.field_rpm), m.rpm) { v -> viewModel.edit { it.copy(rpm = v) } }
+        DecimalField(
+            label = stringResource(R.string.field_power_kw),
+            value = m.powerKw,
+            onValue = { v -> viewModel.edit { it.copy(powerKw = v) } }
+        )
+        IntField(
+            label = stringResource(R.string.field_voltage),
+            value = m.voltage,
+            onValue = { v -> viewModel.edit { it.copy(voltage = v) } }
+        )
+        DecimalField(
+            label = stringResource(R.string.field_current),
+            value = m.currentA,
+            onValue = { v -> viewModel.edit { it.copy(currentA = v) } }
+        )
+        IntField(
+            label = stringResource(R.string.field_rpm),
+            value = m.rpm,
+            onValue = { v -> viewModel.edit { it.copy(rpm = v) } }
+        )
 
         Text(stringResource(R.string.field_phases), style = MaterialTheme.typography.labelLarge)
         ChipRow(
             options = listOf(1, 3),
             selected = m.phases,
-            optionText = { stringResource(if (it == 1) R.string.calc_phase_single else R.string.calc_phase_three) },
+            optionText = {
+                stringResource(if (it == 1) R.string.calc_phase_single else R.string.calc_phase_three)
+            },
             onSelect = { p -> viewModel.edit { it.copy(phases = p) } }
         )
 
-        IntField(stringResource(R.string.field_slots), m.slots) { v -> viewModel.edit { it.copy(slots = v) } }
-        IntField(stringResource(R.string.field_poles), m.poles) { v -> viewModel.edit { it.copy(poles = v) } }
+        IntField(
+            label = stringResource(R.string.field_slots),
+            value = m.slots,
+            onValue = { v -> viewModel.edit { it.copy(slots = v) } }
+        )
+        IntField(
+            label = stringResource(R.string.field_poles),
+            value = m.poles,
+            onValue = { v -> viewModel.edit { it.copy(poles = v) } }
+        )
 
         Text(stringResource(R.string.field_connection), style = MaterialTheme.typography.labelLarge)
         ChipRow(
@@ -86,8 +112,16 @@ fun MotorEditScreen(onDone: () -> Unit, viewModel: MotorEditViewModel = hiltView
             onSelect = { c -> viewModel.edit { it.copy(connection = c) } }
         )
 
-        DecimalField(stringResource(R.string.field_wire_diameter), m.wireDiameterMm) { v -> viewModel.edit { it.copy(wireDiameterMm = v) } }
-        IntField(stringResource(R.string.field_turns_per_coil), m.turnsPerCoil) { v -> viewModel.edit { it.copy(turnsPerCoil = v) } }
+        DecimalField(
+            label = stringResource(R.string.field_wire_diameter),
+            value = m.wireDiameterMm,
+            onValue = { v -> viewModel.edit { it.copy(wireDiameterMm = v) } }
+        )
+        IntField(
+            label = stringResource(R.string.field_turns_per_coil),
+            value = m.turnsPerCoil,
+            onValue = { v -> viewModel.edit { it.copy(turnsPerCoil = v) } }
+        )
 
         OutlinedTextField(
             value = m.notes,

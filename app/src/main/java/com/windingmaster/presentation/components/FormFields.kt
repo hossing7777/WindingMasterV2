@@ -85,7 +85,7 @@ fun <T> DropdownField(
     label: String,
     options: List<T>,
     selected: T,
-    optionText: (T) -> String,
+    optionText: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -121,7 +121,7 @@ fun <T> DropdownField(
 fun <T> ChipRow(
     options: List<T>,
     selected: T,
-    optionText: (T) -> String,
+    optionText: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
