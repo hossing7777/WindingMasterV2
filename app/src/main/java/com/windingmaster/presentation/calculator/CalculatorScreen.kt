@@ -110,7 +110,7 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = hiltViewModel()) {
             )
             when (diagramIndex) {
                 0 -> WindingDiagram(result)
-                1 -> ExtendedDiagram(result)
+                1 -> ExtendedDiagram(result, selectedSlot = state.selectedSlot, onSlotClick = viewModel::onSlotSelected)
                 else -> InteractiveDiagram(result, state.selectedSlot, viewModel::onSlotSelected)
             }
 
