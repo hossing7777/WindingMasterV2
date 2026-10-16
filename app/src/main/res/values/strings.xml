@@ -32,6 +32,10 @@
     <string name="calc_phase_three">سه‌فاز</string>
     <string name="calc_winding_type">نوع سیم‌بندی</string>
     <string name="wt_full">گام کامل</string>
+    <string name="wt_full_concentric">گام کامل + متحدالمرکز</string>
+    <string name="wt_full_series">گام کامل + سری</string>
+    <string name="wt_fractional_concentric">گام کسری + متحدالمرکز</string>
+    <string name="wt_fractional_series">گام کسری + سری</string>
     <string name="wt_shortened">کوتاه‌شده</string>
     <string name="wt_concentric">متحدالمرکز</string>
     <string name="wt_series">سری</string>

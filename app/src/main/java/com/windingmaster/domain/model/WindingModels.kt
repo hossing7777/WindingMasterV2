@@ -14,7 +14,7 @@ data class WindingInput(
     val poles: Int,
     val frequency: Int = 50,
     val phases: Int = 3,
-    val windingType: WindingType = WindingType.FULL,
+    val windingType: WindingType = WindingType.FULL_CONCENTRIC,
     val coilPitch: Int? = null
 )
 

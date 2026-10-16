@@ -197,7 +197,7 @@ private fun InputsCard(state: CalculatorUiState, vm: CalculatorViewModel) {
             )
             DropdownField(
                 label = stringResource(R.string.calc_winding_type),
-                options = listOf(WindingType.FULL, WindingType.SHORTENED, WindingType.CONCENTRIC, WindingType.SERIES),
+                options = WindingType.values().toList(),
                 selected = state.windingType,
                 optionText = { stringResource(it.labelRes()) },
                 onSelect = vm::onWindingTypeChange,

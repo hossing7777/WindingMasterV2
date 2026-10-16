@@ -32,6 +32,10 @@
     <string name="calc_phase_three">Three-phase</string>
     <string name="calc_winding_type">Winding type</string>
     <string name="wt_full">Full pitch</string>
+    <string name="wt_full_concentric">Full pitch + Concentric</string>
+    <string name="wt_full_series">Full pitch + Series</string>
+    <string name="wt_fractional_concentric">Fractional + Concentric</string>
+    <string name="wt_fractional_series">Fractional + Series</string>
     <string name="wt_shortened">Short pitch</string>
     <string name="wt_concentric">Concentric</string>
     <string name="wt_series">Series</string>

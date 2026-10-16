@@ -6,23 +6,6 @@ import com.windingmaster.domain.model.SlotAssignment
 import com.windingmaster.domain.model.WindingType
 import javax.inject.Inject
 
-/**
- * تخصیص فاز/جهت به شیارها با حساب صحیح (بدون خطای اعشاری).
- *
- * سه‌فاز: هر دور الکتریکی 6 کمربند 60 درجه‌ای دارد:
- *   U+ , W- , V+ , U- , W+ , V-
- * کمربند شیار i برابر است با ((i-1) * 6 * P) / Z (تقسیم صحیح).
- * وقتی q کسری باشد، اندازه‌ی کمربندها خودبه‌خود 3-2-3-2 می‌شود.
- *
- * تک‌فاز: کمربندهای 180 درجه‌ای، زوج = Main (بالا)، فرد = Aux (پایین).
- *
- * متحدالمرکز (Concentric):
- *   کویل‌ها در هر کمربند به صورت قرینه تودرتو می‌شوند:
- *   شیار اول کمربند ←→ شیار آخر کمربند (بزرگ‌ترین گام)
- *   شیار دوم ←→ شیار یکی‌مانده‌به‌آخر (گام کوچک‌تر)
- *   ...
- *   نیمه‌ی دوم کمربند، جفت‌شدن معکوس دارند (به شیار شروع برمی‌گردند).
- */
 class CoilGroupAssigner @Inject constructor() {
 
     data class Output(
@@ -35,7 +18,6 @@ class CoilGroupAssigner @Inject constructor() {
         polePairs: Int,
         phases: Int,
         type: WindingType,
-        fractional: Boolean,
         y1: Int,
         y2: Int
     ): Output {
@@ -59,26 +41,25 @@ class CoilGroupAssigner @Inject constructor() {
         val beltSlots = LinkedHashMap<Int, MutableList<Int>>()
         for (s in 1..z) beltSlots.getOrPut(belt(s)) { mutableListOf() }.add(s)
 
-        val isConcentric = type == WindingType.CONCENTRIC
+        val isConcentric = type.isConcentric
+        val isFractional = type.isFractional
 
-        // محاسبه‌ی لیست گام‌ها برای هر شیار در یک کمربند با n شیار
-        fun pitchesFor(n: Int): List<Int> = when {
-            isConcentric -> {
-                // الگوی قرینه: n-1, n-3, n-5, ..., 1, 1, ..., n-5, n-3, n-1
-                List(n) { k ->
-                    val distFromEdge = minOf(k, n - 1 - k)
-                    (n - 1 - 2 * distFromEdge).coerceAtLeast(1)
-                }
+        /**
+         * محاسبه‌ی گام‌های هر کویل در یک گروه:
+         * - متحدالمرکز: از بیرون به داخل نزولی (y1, y1-2, y1-4, ...)
+         * - سری: همه‌ی کویل‌ها یک گام یکسان (y2)
+         */
+        fun pitchesFor(n: Int): List<Int> =
+            if (isConcentric) {
+                List(n) { k -> (y1 - 2 * k).coerceAtLeast(1) }
+            } else {
+                List(n) { y2 }
             }
-            type == WindingType.SERIES -> List(n) { y2 }
-            else -> List(n) { y2 }
-        }
 
         val groupType = when {
-            fractional -> "FRACTIONAL"
+            isFractional -> "FRACTIONAL"
             isConcentric -> "CONCENTRIC"
-            type == WindingType.SERIES -> "SERIES"
-            else -> "FULL"
+            else -> "SERIES"
         }
 
         val phaseSlots = HashMap<Int, MutableList<List<Int>>>()
@@ -95,11 +76,11 @@ class CoilGroupAssigner @Inject constructor() {
             groupsOfPhase.add(slots)
             pitchesOfPhase.add(pitches)
 
-            val midPoint = (n + 1) / 2  // مرز نیمه‌ی اول و دوم
+            val midpoint = (n + 1) / 2
             slots.forEachIndexed { k, slot ->
                 val pitch = pitches[k]
-                // برای متحدالمرکز: نیمه‌ی دوم به عقب جفت می‌شود
-                val isSecondHalf = isConcentric && k >= midPoint
+                // در متحدالمرکز، نیمه‌ی دوم گروه به سمت شروع (backward) جفت می‌شود
+                val isSecondHalf = isConcentric && k >= midpoint
                 val pairedSlot = if (isSecondHalf) {
                     ((slot - 1 - pitch) % z + z) % z + 1
                 } else {

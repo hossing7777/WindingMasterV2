@@ -2,7 +2,17 @@ package com.windingmaster.domain.model
 
 enum class ConnectionType { STAR, DELTA }
 
-enum class WindingType { FULL, SHORTENED, CONCENTRIC, SERIES }
+/**
+ * چهار ترکیب از دو محور مستقل:
+ *  - PitchType: FULL (گام کامل/مساوی) یا FRACTIONAL (گام کسری)
+ *  - Layout: CONCENTRIC (متحدالمرکز) یا SERIES (سری)
+ */
+enum class WindingType(val isFractional: Boolean, val isConcentric: Boolean) {
+    FULL_CONCENTRIC(false, true),
+    FULL_SERIES(false, false),
+    FRACTIONAL_CONCENTRIC(true, true),
+    FRACTIONAL_SERIES(true, false);
+}
 
 data class MotorProfile(
     val id: Long = 0,

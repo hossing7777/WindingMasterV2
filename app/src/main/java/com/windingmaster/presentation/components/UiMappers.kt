@@ -26,10 +26,10 @@ fun CalcWarning.messageRes(): Int = when (this) {
 
 @StringRes
 fun WindingType.labelRes(): Int = when (this) {
-    WindingType.FULL -> R.string.wt_full
-    WindingType.SHORTENED -> R.string.wt_shortened
-    WindingType.CONCENTRIC -> R.string.wt_concentric
-    WindingType.SERIES -> R.string.wt_series
+    WindingType.FULL_CONCENTRIC -> R.string.wt_full_concentric
+    WindingType.FULL_SERIES -> R.string.wt_full_series
+    WindingType.FRACTIONAL_CONCENTRIC -> R.string.wt_fractional_concentric
+    WindingType.FRACTIONAL_SERIES -> R.string.wt_fractional_series
 }
 
 @StringRes

@@ -7,7 +7,6 @@ import com.windingmaster.domain.model.WindingInput
 import com.windingmaster.domain.model.WindingResult
 import com.windingmaster.domain.model.WindingType
 import javax.inject.Inject
-import kotlin.math.ceil
 
 class WindingCalculator @Inject constructor(
     private val assigner: CoilGroupAssigner
@@ -37,13 +36,23 @@ class WindingCalculator @Inject constructor(
         val t = z.toDouble() / poles
         val n = 60 * input.frequency / pairs
 
+        // گام قطبی به عدد صحیح (floor)
         val g = z / poles
         val gReduced = (g - 2).coerceAtLeast(1)
-        val y1 = input.coilPitch ?: g
-        val y2 = if (input.windingType == WindingType.SHORTENED) (y1 - 2).coerceAtLeast(1) else y1
-        val b = ceil(t * 0.5 + 1.0 - EPS).toInt()
 
-        fun startOf(deg: Int): Int = ceil(deg / aez - EPS).toInt() + 1
+        // محاسبه‌ی y1 (گام بیرونی) و y2 (گام داخلی/یکنواخت) بر اساس نوع
+        val (y1Auto, y2Auto) = when (input.windingType) {
+            WindingType.FULL_CONCENTRIC -> (g - 1).coerceAtLeast(1) to (g - 1).coerceAtLeast(1)
+            WindingType.FULL_SERIES -> g to g
+            WindingType.FRACTIONAL_CONCENTRIC -> (g - 2).coerceAtLeast(1) to (g - 2).coerceAtLeast(1)
+            WindingType.FRACTIONAL_SERIES -> (g - 2).coerceAtLeast(1) to (g - 2).coerceAtLeast(1)
+        }
+
+        val y1 = input.coilPitch ?: y1Auto
+        val y2 = input.coilPitch ?: y2Auto
+
+        // شروع فازها
+        fun startOf(deg: Int): Int = kotlin.math.ceil(deg / aez - EPS).toInt() + 1
         val starts = if (input.phases == 3) listOf(1, startOf(120), startOf(240))
                      else listOf(1, startOf(180))
 
@@ -55,14 +64,17 @@ class WindingCalculator @Inject constructor(
             if (input.phases == 3 && z % 3 != 0) add(CalcWarning.SLOTS_NOT_DIVISIBLE_BY_3)
         }
 
-        val out = assigner.assign(z, pairs, input.phases, input.windingType, fractional, y1, y2)
+        val out = assigner.assign(z, pairs, input.phases, input.windingType, y1, y2)
+
+        // B = ceil(T/2 + 1) — شیار پرش برای کنسنتریک
+        val b = kotlin.math.ceil(t * 0.5 + 1.0 - EPS).toInt()
 
         return WindingResult(
             z = z, poles = poles, polePairs = pairs, phases = input.phases,
             frequency = input.frequency,
             isFractional = fractional,
-            isConcentric = input.windingType == WindingType.CONCENTRIC,
-            isShortPitched = y2 < g,
+            isConcentric = input.windingType.isConcentric,
+            isShortPitched = input.windingType.isFractional,
             electricalAngle = aez,
             slotsPerPolePerPhase = q,
             polePitch = t,
