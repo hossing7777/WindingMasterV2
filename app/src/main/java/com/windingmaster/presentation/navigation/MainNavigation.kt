@@ -31,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.windingmaster.R
+import com.windingmaster.presentation.advanced.AdvancedWindingScreen
 import com.windingmaster.presentation.calculator.CalculatorScreen
 import com.windingmaster.presentation.checklist.ChecklistScreen
 import com.windingmaster.presentation.notes.NoteEditScreen
@@ -43,6 +44,7 @@ import com.windingmaster.presentation.settings.SettingsScreen
 private fun Screen.icon(): ImageVector = when (this) {
     Screen.Motors -> Icons.Default.Build
     Screen.Calculator -> Icons.Default.Calculate
+    Screen.Advanced -> Icons.Default.Settings
     Screen.Checklist -> Icons.Default.Checklist
     Screen.Profile -> Icons.Default.Person
     Screen.Notes -> Icons.Default.Description
@@ -127,6 +129,7 @@ fun MainNavigation() {
                 MotorEditScreen(onDone = { navController.popBackStack() })
             }
             composable(Screen.Calculator.route) { CalculatorScreen() }
+            composable(Screen.Advanced.route) { AdvancedWindingScreen() }
             composable(Screen.Checklist.route, arguments = listOf(longArg("motorId"))) {
                 ChecklistScreen()
             }

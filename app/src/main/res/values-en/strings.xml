@@ -3,6 +3,7 @@
     <string name="app_name">Winding Master</string>
     <string name="nav_motors">Motors</string>
     <string name="nav_calculator">Calculator</string>
+    <string name="nav_advanced">Advanced</string>
     <string name="nav_checklist">Checklist</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_notes">Notes</string>

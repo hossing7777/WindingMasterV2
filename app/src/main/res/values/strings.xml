@@ -3,6 +3,7 @@
     <string name="app_name">استاد سیم‌پیچی</string>
     <string name="nav_motors">موتورها</string>
     <string name="nav_calculator">محاسبه</string>
+    <string name="nav_advanced">پیشرفته</string>
     <string name="nav_checklist">چک‌لیست</string>
     <string name="nav_profile">پروفایل</string>
     <string name="nav_notes">یادداشت</string>

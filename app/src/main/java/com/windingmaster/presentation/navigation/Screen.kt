@@ -13,6 +13,8 @@ sealed class Screen(val base: String, val route: String, @StringRes val titleRes
 
     object Calculator : Screen("calculator", "calculator", R.string.nav_calculator)
 
+    object Advanced : Screen("advanced", "advanced", R.string.nav_advanced)
+
     object Checklist : Screen("checklist", "checklist?motorId={motorId}", R.string.nav_checklist) {
         fun create(motorId: Long = -1L) = "checklist?motorId=$motorId"
     }
@@ -34,7 +36,7 @@ sealed class Screen(val base: String, val route: String, @StringRes val titleRes
 }
 
 val bottomNavScreens: List<Screen> = listOf(
-    Screen.Motors, Screen.Calculator, Screen.Checklist, Screen.Profile, Screen.Notes
+    Screen.Motors, Screen.Calculator, Screen.Advanced, Screen.Checklist, Screen.Profile, Screen.Notes
 )
 
 val allScreens: List<Screen> = bottomNavScreens + listOf(
