@@ -17,6 +17,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -61,6 +62,8 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = hiltViewModel()) {
     val saved by viewModel.savedCalculations.collectAsStateWithLifecycle()
     var diagramIndex by rememberSaveable { mutableIntStateOf(2) }
     var showSave by rememberSaveable { mutableStateOf(false) }
+    var showMain by rememberSaveable { mutableStateOf(true) }
+    var showAux by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
 
     LaunchedEffect(state.lastSavedName) {
@@ -110,7 +113,30 @@ fun CalculatorScreen(viewModel: CalculatorViewModel = hiltViewModel()) {
             )
             when (diagramIndex) {
                 0 -> WindingDiagram(result)
-                1 -> ExtendedDiagram(result, selectedSlot = state.selectedSlot, onSlotClick = viewModel::onSlotSelected)
+                1 -> {
+                    if (result.phases == 1) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = showMain,
+                                onClick = { showMain = !showMain },
+                                label = { Text("سیم اصلی") }
+                            )
+                            FilterChip(
+                                selected = showAux,
+                                onClick = { showAux = !showAux },
+                                label = { Text("سیم فرعی") }
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                    }
+                    ExtendedDiagram(
+                        result,
+                        selectedSlot = state.selectedSlot,
+                        onSlotClick = viewModel::onSlotSelected,
+                        showMain = showMain,
+                        showAux = showAux
+                    )
+                }
                 else -> InteractiveDiagram(result, state.selectedSlot, viewModel::onSlotSelected)
             }
 
