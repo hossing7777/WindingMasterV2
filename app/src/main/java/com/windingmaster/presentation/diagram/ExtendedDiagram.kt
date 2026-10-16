@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,30 +37,33 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.windingmaster.R
 import com.windingmaster.domain.model.SlotAssignment
 import com.windingmaster.domain.model.WindingResult
 import com.windingmaster.presentation.components.DiagramLegend
 import com.windingmaster.presentation.components.ForceLtr
-import com.windingmaster.presentation.components.PhaseColors
 import com.windingmaster.presentation.components.PhaseStyle
 import com.windingmaster.presentation.components.onPhaseColor
 import com.windingmaster.presentation.components.rememberPhaseStyle
+import kotlin.math.abs
 import kotlin.math.min
 
-private val SlotWidth = 44.dp
+/** عرض حداقلی برای هر شیار (برای اسکرول در Z بزرگ) */
+private val MinSlotWidth = 26.dp
+
+/** عرض حداکثری برای هر شیار (وقتی Z کوچک است) */
+private val MaxSlotWidth = 46.dp
 
 /** رنگ‌های سه‌گانه برای هایلایت */
-private val SelectedColor = Color(0xFFD32F2F)   // قرمز — شیار انتخابی
-private val PairedColor   = Color(0xFFE040FB)   // بنفش — شیار مقابل
-private val WireColor     = Color(0xFF00C853)   // سبز — سیم/قوس اتصال
+private val SelectedColor = Color(0xFFD32F2F)
+private val PairedColor   = Color(0xFFE040FB)
+private val WireColor     = Color(0xFF00C853)
 
 @Composable
 fun ExtendedDiagram(
@@ -81,36 +85,49 @@ fun ExtendedDiagram(
     var viewportPx by remember { mutableIntStateOf(0) }
     val pairedSel = selectedSlot?.let { bySlot[it]?.pairedSlot }
 
-    LaunchedEffect(selectedSlot, viewportPx) {
-        if (selectedSlot != null && viewportPx > 0) {
-            val w = with(density) { SlotWidth.toPx() }
-            scroll.animateScrollTo(((selectedSlot - 0.5f) * w - viewportPx / 2f).toInt().coerceAtLeast(0))
-        }
-    }
+    // عرض خودکار شیار: کل دیاگرام تا حد امکان در صفحه جا شود
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val availableWidth: Dp = maxWidth - 8.dp
+        // عرض هر شیار = عرض موجود / تعداد شیار (با کف و سقف)
+        val idealWidth: Dp = availableWidth / result.z
+        val slotWidth: Dp = idealWidth.coerceIn(MinSlotWidth, MaxSlotWidth)
+        val needsScroll = slotWidth * result.z > availableWidth
 
-    ForceLtr {
-        Column(modifier) {
+        // فقط وقتی اسکرول داریم، شیار انتخاب‌شده را وسط بیاور
+        LaunchedEffect(selectedSlot, pairedSel, viewportPx, needsScroll) {
+            if (needsScroll && selectedSlot != null && viewportPx > 0) {
+                val w = with(density) { slotWidth.toPx() }
+                val pair = pairedSel ?: selectedSlot
+                val midSlot = (selectedSlot + pair) / 2f
+                scroll.animateScrollTo((midSlot * w - viewportPx / 2f).toInt().coerceAtLeast(0))
+            }
+        }
+
+        Column {
             Box(
                 Modifier
                     .fillMaxWidth()
                     .onSizeChanged { viewportPx = it.width }
-                    .horizontalScroll(scroll)
+                    .then(if (needsScroll) Modifier.horizontalScroll(scroll) else Modifier)
             ) {
                 Canvas(
                     Modifier
-                        .width(SlotWidth * result.z)
+                        .width(slotWidth * result.z)
                         .height(276.dp)
                         .clipToBounds()
-                        .pointerInput(result.z) {
+                        .pointerInput(result.z, slotWidth) {
                             detectTapGestures(onTap = { p ->
                                 clickHandler?.let { cb ->
-                                    val w = SlotWidth.toPx()
+                                    val w = slotWidth.toPx()
                                     cb((p.x / w).toInt().coerceIn(0, result.z - 1) + 1)
                                 }
                             })
                         }
                 ) {
-                    drawExtended(result, bySlot, style, measurer, starts, selectedSlot, pairedSel, ink, soft)
+                    drawExtended(
+                        result, bySlot, style, measurer, starts,
+                        selectedSlot, pairedSel, ink, soft, slotWidth.toPx()
+                    )
                 }
             }
             if (selectedSlot != null && pairedSel != null) {
@@ -121,7 +138,6 @@ fun ExtendedDiagram(
     }
 }
 
-/** کادر کوچک اطلاعات رابطه‌ی شیار انتخابی و شیار مقابل */
 @Composable
 private fun SlotRelationCard(
     selected: Int,
@@ -129,7 +145,7 @@ private fun SlotRelationCard(
     bySlot: Map<Int, SlotAssignment>,
     style: PhaseStyle
 ) {
-    val span = kotlin.math.abs(paired - selected)
+    val span = abs(paired - selected)
     val selAssign = bySlot[selected]
     val pairedAssign = bySlot[paired]
     val selPhase = selAssign?.let { style.label(it.phase) } ?: "?"
@@ -169,17 +185,17 @@ private fun SlotRelationCard(
 @Composable
 private fun LegendDot(color: Color, label: String, modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.width(14.dp).height(14.dp).clipToBounds()
-            .padding(0.dp).then(Modifier)) {
-            Canvas(Modifier.width(14.dp).height(14.dp)) {
-                drawRoundRect(color, size = size, cornerRadius = CornerRadius(3f))
-            }
+        Canvas(Modifier.width(14.dp).height(14.dp)) {
+            drawRoundRect(color, size = size, cornerRadius = CornerRadius(3f))
         }
         Text(label, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 4.dp))
     }
 }
 
-private fun DrawScope.coilArc(x1: Float, x2: Float, baseY: Float, peak: Float, color: Color, width: Float, dashed: Boolean) {
+private fun DrawScope.coilArc(
+    x1: Float, x2: Float, baseY: Float, peak: Float,
+    color: Color, width: Float, dashed: Boolean
+) {
     val path = Path().apply {
         moveTo(x1, baseY)
         quadraticBezierTo((x1 + x2) / 2f, baseY - 2f * peak, x2, baseY)
@@ -202,25 +218,25 @@ private fun DrawScope.drawExtended(
     selected: Int?,
     pairedSel: Int?,
     ink: Color,
-    soft: Color
+    soft: Color,
+    slotW: Float
 ) {
     val z = result.z
-    val w = SlotWidth.toPx()
+    val w = slotW
     val rectH = 72.dp.toPx()
     val baseY = 150.dp.toPx()
     val total = z * w
 
-    // پس‌زمینه‌ی شیار انتخابی
+    // پس‌زمینه‌ی شیارها
     if (selected != null) {
         drawRect(SelectedColor.copy(alpha = 0.10f), Offset((selected - 1) * w, 0f), Size(w, size.height))
     }
     if (pairedSel != null) {
         drawRect(PairedColor.copy(alpha = 0.10f), Offset((pairedSel - 1) * w, 0f), Size(w, size.height))
     }
-    // نوار هسته‌ی استاتور
     drawRect(soft, Offset(0f, baseY - 4.dp.toPx()), Size(total, rectH + 8.dp.toPx()))
 
-    // قوس‌های کویل
+    // قوس‌ها
     val strokeW = 2.dp.toPx()
     val maxPeak = 135.dp.toPx()
     for (a in result.slotAssignments) {
@@ -231,13 +247,12 @@ private fun DrawScope.drawExtended(
         val x2 = x1 + span * w
         val peak = min(span * w * 0.5f, maxPeak)
 
-        // آیا این قوس مربوط به شیار انتخابی است؟
         val isSelectedArc = selected != null && a.slotNumber == selected
         val isPairedArc = pairedSel != null && a.slotNumber == pairedSel
         val hot = isSelectedArc || isPairedArc
 
         val color = when {
-            isSelectedArc -> WireColor          // قوس از شیار انتخابی → سبز روشن
+            isSelectedArc -> WireColor
             isPairedArc   -> WireColor.copy(alpha = 0.5f)
             else          -> style.color(a.phase).copy(alpha = 0.9f)
         }
@@ -246,18 +261,17 @@ private fun DrawScope.drawExtended(
         if (x2 > total) coilArc(x1 - total, x2 - total, baseY - 2.dp.toPx(), peak, color, sw, dashed = true)
     }
 
-    val letterStyle = { c: Color -> TextStyle(color = c, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
-    val numberStyle = { c: Color -> TextStyle(color = c, fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+    val letterStyle = { c: Color -> TextStyle(color = c, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+    val numberStyle = { c: Color -> TextStyle(color = c, fontSize = 11.sp, fontWeight = FontWeight.Bold) }
 
     for (i in 1..z) {
         val a = bySlot[i] ?: continue
         val cx = (i - 0.5f) * w
         val color = style.color(a.phase)
         val onColor = onPhaseColor(color)
-        val rw = w * 0.78f
+        val rw = w * 0.82f
         val topLeft = Offset(cx - rw / 2f, baseY)
 
-        // هایلایت سه‌گانه: قرمز برای انتخابی، بنفش برای مقابل
         when (i) {
             selected -> {
                 val pad = 4.dp.toPx()
@@ -295,18 +309,20 @@ private fun DrawScope.drawExtended(
         drawLine(onColor, Offset(cx, head), Offset(cx - wing, head + back), strokeWidth = sw)
         drawLine(onColor, Offset(cx, head), Offset(cx + wing, head + back), strokeWidth = sw)
 
-        // حرف فاز
-        drawCentered(measurer, style.label(a.phase), Offset(cx, baseY + rectH + 14.dp.toPx()), letterStyle(color))
+        // حرف فاز (فقط اگر عرض کافی باشد)
+        if (w > 30f) {
+            drawCentered(measurer, style.label(a.phase), Offset(cx, baseY + rectH + 14.dp.toPx()), letterStyle(color))
+        }
 
-        // برچسب U1/V1/W1
+        // برچسب شروع فاز
         starts[i]?.let { idx ->
             val pillColor = style.colors.getOrElse(idx) { color }
-            val pillW = 34.dp.toPx()
-            val pillH = 20.dp.toPx()
-            val py = baseY + rectH + 40.dp.toPx()
+            val pillW = 30.dp.toPx()
+            val pillH = 18.dp.toPx()
+            val py = baseY + rectH + (if (w > 30f) 40.dp.toPx() else 20.dp.toPx())
             drawRoundRect(
                 pillColor, Offset(cx - pillW / 2f, py - pillH / 2f), Size(pillW, pillH),
-                CornerRadius(10.dp.toPx())
+                CornerRadius(9.dp.toPx())
             )
             drawCentered(measurer, style.label(idx + 1) + "1", Offset(cx, py), numberStyle(onPhaseColor(pillColor)))
         }
